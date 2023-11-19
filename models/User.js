@@ -10,6 +10,7 @@ const UserSchema = new Schema({
     },
     email: {
         type: String,
+        unique: true ,
         required: [true, 'please provide an email'],
         validate: {
             validator : validator.isEmail ,

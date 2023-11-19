@@ -1,5 +1,19 @@
+const User = require('../models/User')
+const {StatusCodes} = require('http-status-codes')
+const CustomError = require('../errors')
+
+
 const register = async (req, res) => {
-    res.send('register user')
+    
+    const { email } = req.body
+    console.log(email)
+    const emailAlreadyExists = await User.findOne(email)
+    if(emailAlreadyExists){
+        throw new CustomError.BadRequestError('Email already exists, please use another one ')
+    }
+
+    const newRegisteredUser = await User.create(req.body)
+    res.status(StatusCodes.CREATED).send({newRegisteredUser})
 }
 
 const login = async (req, res) => {
