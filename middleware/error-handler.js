@@ -3,7 +3,7 @@ const { StatusCodes } = require('http-status-codes')
 const errorHandlerMiddleware = (err, req, res, next) => {
     let customError = {
         statuscode : err.statuscode || StatusCodes.INTERNAL_SERVER_ERROR,
-        msg: err.msg || 'Something went wrong, please try again later...'
+        message: err.message || 'Something went wrong, please try again later...'
     }
 
     if( err.name === 'ValidationError'){
@@ -25,7 +25,7 @@ const errorHandlerMiddleware = (err, req, res, next) => {
         customError.statuscode = 404;
       }
     
-      return res.status(customError.statuscode).json({ msg: customError.msg });
+      return res.status(customError.statuscode).json({ msg: customError.message });
 
 }
 
