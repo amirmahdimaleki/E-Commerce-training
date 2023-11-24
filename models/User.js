@@ -1,5 +1,6 @@
 const {model, Schema} = require('mongoose')
 const validator = require('validator')
+const bcrypt = require('bcryptjs')
 
 const UserSchema = new Schema({
     name: {
@@ -29,5 +30,19 @@ const UserSchema = new Schema({
     }
 
 })
+
+
+//! has to be a function declaration because : this refers to user
+UserSchema.pre('save', async function(){
+    const salt = await bcrypt.genSalt(10)
+    // this.password is the password in the UserSchema
+    this.password = await bcrypt.hash(this.password, salt)
+})
+
+UserSchema.methods.comparePassword = async function(candidatePassword){
+    const isMatch = await bcrypt.compare(candidatePassword, this.password)
+    return isMatch
+}
+
 
 module.exports = model('User', UserSchema)

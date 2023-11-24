@@ -1,18 +1,34 @@
+require('dotenv').config();
 const User = require('../models/User')
 const {StatusCodes} = require('http-status-codes')
 const CustomError = require('../errors')
+const {createJWT, isTokenValid} = require('../utils')
 
 
 const register = async (req, res) => {
-    const { email, name, password } = req.body;
+    const {name, email, password} = req.body;
   
     const emailAlreadyExists = await User.findOne({ email });
     if (emailAlreadyExists) {
       throw new CustomError.BadRequestError('Email already exists');
     }
 
-    const newRegisteredUser = await User.create(req.body)
-    res.status(StatusCodes.CREATED).send({newRegisteredUser})
+    // The first user is considered as admin functionality:
+
+    const isFirstUser = await User.countDocuments({}) === 0
+    const role = isFirstUser ? 'admin' : 'user'
+
+    const newRegisteredUser = await User.create({name, email, password, role})
+
+    const userTokenPayload = {
+        name : newRegisteredUser.name,
+        userId : newRegisteredUser._id,
+        role : newRegisteredUser.role
+    }
+    
+    const token = createJWT({payload : userTokenPayload})  
+  
+    res.status(StatusCodes.CREATED).json({newRegisteredUser : userTokenPayload, token})
 }
 
 const login = async (req, res) => {
