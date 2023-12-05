@@ -1,6 +1,6 @@
 const User = require('../models/User')
 const {StatusCodes} = require('http-status-codes')
-const {CustomError} = require('../middleware/error-handler')
+const CustomError = require('../errors')
 
 
 const getAllUsers = async(req, res) => {
@@ -16,6 +16,7 @@ const getSingleUser = async(req, res) => {
     }
     res.status(StatusCodes.OK).json({ user })
 }
+
 const showCurrentUser = async(req, res) => {
     res.send('current user')
 

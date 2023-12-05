@@ -1,4 +1,3 @@
-// require('dotenv').config()
 const jwt = require('jsonwebtoken')
 
 
@@ -22,6 +21,7 @@ const attachCookiesToResponse = ({res, user}) => {
     httpOnly: true,
     expires: new Date(Date.now() +  1000 * 60 * 60 * 24), // one day
     secure: process.env.NODE_ENV === 'production',
+    // make a signedCookie: 
     signed: true
  })
 }
