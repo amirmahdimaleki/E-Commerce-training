@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { authenticateUser } = require('../middleware/authentication.js')
+const { authenticateUser, authorizePermissions } = require('../middleware/authentication.js')
 
 
 const {
@@ -16,7 +16,7 @@ const {
 //? this authentication could be implemented in app js like this:
 //? app.use('/api/v1/users', authenticateUser, userRouter)
 
-router.route('/').get(authenticateUser, getAllUsers)
+router.route('/').get(authenticateUser, authorizePermissions, getAllUsers)
 
 router.route('/showMe').get(showCurrentUser)
 
