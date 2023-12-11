@@ -16,7 +16,7 @@ const {
 //? this authentication could be implemented in app js like this:
 //? app.use('/api/v1/users', authenticateUser, userRouter)
 
-router.route('/').get(authenticateUser, authorizePermissions, getAllUsers)
+router.route('/').get(authenticateUser, authorizePermissions('admin', 'user'), getAllUsers)
 
 router.route('/showMe').get(showCurrentUser)
 
