@@ -2,7 +2,7 @@ require('dotenv').config();
 const User = require('../models/User')
 const {StatusCodes} = require('http-status-codes')
 const CustomError = require('../errors')
-const {attachCookiesToResponse} = require('../utils')
+const { attachCookiesToResponse, createTokenUser } = require('../utils')
 
 
 const register = async (req, res) => {
@@ -20,14 +20,10 @@ const register = async (req, res) => {
 
     const newRegisteredUser = await User.create({name, email, password, role})
 
-    const userTokenPayload = {
-        name : newRegisteredUser.name,
-        userId : newRegisteredUser._id,
-        role : newRegisteredUser.role
-    }
+    const userTokenPayload = createTokenUser(newRegisteredUser)
     attachCookiesToResponse({res, user: userTokenPayload})
 
-    res.status(StatusCodes.CREATED).json({ user: userTokenPayload });
+    res.status(StatusCodes.OK).json({ user: userTokenPayload });
 }
 
 const login = async (req, res) => {
@@ -47,11 +43,7 @@ const login = async (req, res) => {
         throw new CustomError.UnauthenticatedError("Invalid credentials dumb ass")
     }
 
-    const userTokenPayload = {
-        name : user.name,
-        userId : user._id,
-        role : user.role
-    }
+    const userTokenPayload = createTokenUser(user)
     attachCookiesToResponse({res, user: userTokenPayload})
 
     res.status(StatusCodes.CREATED).json({ user: userTokenPayload });
