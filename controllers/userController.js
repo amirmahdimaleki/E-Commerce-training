@@ -1,7 +1,7 @@
 const User = require('../models/User')
 const {StatusCodes} = require('http-status-codes')
 const CustomError = require('../errors')
-const { createTokenUser, attachCookiesToResponse } = require('../utils');
+const { createTokenUser, attachCookiesToResponse, checkPermissions } = require('../utils');
 
 
 const getAllUsers = async(req, res) => {
@@ -15,6 +15,7 @@ const getSingleUser = async(req, res) => {
     if(!user){
         throw new CustomError.NotFoundError(`No user with the id of ${req.params.id} found`)
     }
+    checkPermissions(req.user, user._id)
     res.status(StatusCodes.OK).json({ user })
 }
 
@@ -28,8 +29,13 @@ const updateUser = async(req, res) => {
     if(!email || !name ){
         throw new CustomError.BadRequestError('provide email and name, you numb nuts')
     }
-    // & ====================== CONTINUE WITH THE 36th VIDEO WITHOUT findByIdAndUpdate ================
-    const user = await User.findByIdAndUpdate 
+    
+    const user = await User.findOne({_id: req.user.userId})
+
+    user.email = email
+    user.name = name
+    
+    await user.save()
 
     const tokenUser = createTokenUser(user)
     attachCookiesToResponse({res, user:tokenUser})
@@ -48,7 +54,7 @@ const updateUserPassword = async(req, res) => {
         throw new CustomError.UnauthenticatedError('invalid credentials')
     }
     user.password = newPassword
-
+// ! important code related to this is User.js Model
     await user.save()
     res.status(StatusCodes.OK).json({ message : 'password successfully updated' })
 }
