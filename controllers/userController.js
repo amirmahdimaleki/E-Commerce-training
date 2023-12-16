@@ -4,13 +4,13 @@ const CustomError = require('../errors')
 const { createTokenUser, attachCookiesToResponse, checkPermissions } = require('../utils');
 
 
-const getAllUsers = async(req, res) => {
+const getAllUsers = async (req, res) => {
     // ^                                    removes pass from response
     const users = await User.find({role : 'user'}).select('-password')
     res.status(StatusCodes.OK).json({ users })
 }
 
-const getSingleUser = async(req, res) => {
+const getSingleUser = async (req, res) => {
     const user = await User.findOne({_id : req.params.id}).select('-password')
     if(!user){
         throw new CustomError.NotFoundError(`No user with the id of ${req.params.id} found`)
@@ -19,11 +19,11 @@ const getSingleUser = async(req, res) => {
     res.status(StatusCodes.OK).json({ user })
 }
 
-const showCurrentUser = async(req, res) => {
+const showCurrentUser = async (req, res) => {
    res.status(StatusCodes.OK).json({user: req.user})
 }
 
-const updateUser = async(req, res) => { 
+const updateUser = async (req, res) => { 
     const {email, name} = req.body
     
     if(!email || !name ){
@@ -42,7 +42,7 @@ const updateUser = async(req, res) => {
     res.status(StatusCodes.OK).json({user : tokenUser})
 }
 
-const updateUserPassword = async(req, res) => {
+const updateUserPassword = async (req, res) => {
     const {oldPassword, newPassword} = req.body
     if(!oldPassword || !newPassword){
         throw new CustomError.BadRequestError('Provide both new and old passwords, you idiot')
