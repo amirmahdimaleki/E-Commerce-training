@@ -5,7 +5,7 @@ const { createTokenUser, attachCookiesToResponse, checkPermissions } = require('
 
 
 const getAllUsers = async (req, res) => {
-    // ^                                    removes pass from response
+    // ^                                   removes pass from response
     const users = await User.find({role : 'user'}).select('-password')
     res.status(StatusCodes.OK).json({ users })
 }
