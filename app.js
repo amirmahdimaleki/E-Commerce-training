@@ -14,6 +14,7 @@ const helmet = require('helmet');
 const xss = require('xss-clean');
 const cors = require('cors');
 const mongoSanitize = require('express-mongo-sanitize');
+const bodyParser = require("body-parser")
 
 
 //* database
@@ -34,6 +35,7 @@ app.use(express.json())
 app.use(morgan('tiny'))
 app.use(cookieParser(process.env.JWT_SECRET))
 app.use(cors())
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.get('/', (req, res) => {
     res.send("hi")

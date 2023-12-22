@@ -1,70 +1,84 @@
-const {model, Schema, mongoose} = require('mongoose')
+const mongoose = require('mongoose');
 
-
-const ProductSchema = new Schema({
-    name : {
-        type: String,
-        required: [true, 'please provide a name'],
-        trim: true,
-        maxlength: [100, 'please provide a name with less than 100 characters']
+const ProductSchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      trim: true,
+      required: [true, 'Please provide product name'],
+      maxlength: [100, 'Name can not be more than 100 characters'],
     },
-    price : {
-        type: Number,
-        required: [true, 'please provide a price'],
-        default: 0
+    price: {
+      type: Number,
+      required: [true, 'Please provide product price'],
+      default: 0,
     },
-    description : {
-        type: String,
-        required: [true, 'please describe your product'],
-        maxlength: [1000, 'description should be less than 100 characters']
+    description: {
+      type: String,
+      required: [true, 'Please provide product description'],
+      maxlength: [1000, 'Description can not be more than 1000 characters'],
     },
-    image : {
-        type : String,
-        default: '/uploads/example.jpeg',
-        required : true
+    image: {
+      type: String,
+      default: '/uploads/example.jpeg',
     },
-    category : {
-        type: String,
-        required: [true, 'please provide product category'],
-        enum: ['kitchen', 'office', 'bedroom']
+    category: {
+      type: String,
+      required: [true, 'Please provide product category'],
+      enum: ['office', 'kitchen', 'bedroom'],
     },
-    company : {
-        type: String,
-        required: [true, 'please provide company'],
-        enum: {
-            values: ['ikea', 'liddy', 'morcos'],
-            message: '{VALUE} is not supported'
-        }
+    company: {
+      type: String,
+      required: [true, 'Please provide company'],
+      enum: {
+        values: ['ikea', 'liddy', 'marcos'],
+        message: '{VALUE} is not supported',
+      },
     },
-    colors : {
-        type: [String],
-        required: true,
-
+    colors: {
+      type: [String],
+      default: ['#222'],
+      required: true,
     },
-    featured : {
-        type: Boolean,
-        default: false
+    featured: {
+      type: Boolean,
+      default: false,
     },
-    freeShipping : {
-        type: Boolean,
-        default: false
+    freeShipping: {
+      type: Boolean,
+      default: false,
     },
-    inventory : {
-        type: Number,
-        required: true,
-        default: 15
+    inventory: {
+      type: Number,
+      required: true,
+      default: 15,
     },
-    averageRating : {
-        type: Number,
-        default: 0
+    averageRating: {
+      type: Number,
+      default: 0,
+    },
+    numOfReviews: {
+      type: Number,
+      default: 0,
     },
     user: {
-        type: mongoose.Types.ObjectId,
-        ref: 'User',
-        required: true
-    }
-},
-{timestamps:true}
-)
+      type: mongoose.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+  },
+  { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } }
+);
 
-module.exports = model('Product', ProductSchema)
+ProductSchema.virtual('reviews', {
+  ref: 'Review',
+  localField: '_id',
+  foreignField: 'product',
+  justOne: false,
+});
+
+ProductSchema.pre('remove', async function (next) {
+  await this.model('Review').deleteMany({ product: this._id });
+});
+
+module.exports = mongoose.model('Product', ProductSchema);
