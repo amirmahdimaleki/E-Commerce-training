@@ -2,7 +2,6 @@ const CustomError = require('../errors')
 const {isTokenValid} = require('../utils')
 
 const authenticateUser = async(req, res, next) => {
-    console.log("authenticateUser")
     const token = req.signedCookies.token
 
     if(!token){
@@ -25,7 +24,6 @@ const authorizePermissions = (...roles) => {
           'Unauthorized to access this route'
         );
       }
-        console.log("authorize")
       next();
     };
   };
